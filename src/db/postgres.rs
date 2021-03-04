@@ -3,7 +3,7 @@ use std::env;
 use serenity::{async_trait, model::prelude::*};
 use sqlx::{postgres::Postgres as SQLxPostgres, Pool};
 
-use super::{redis::Redis, PathogenDb};
+use super::{redis::Redis, DbResult, PathogenDb};
 
 pub struct Postgres {
     pool: Pool<SQLxPostgres>,
@@ -50,7 +50,11 @@ impl PathogenDb for Postgres {
         }
     }
 
-    async fn set_guild_prefix(&self, guild_id: GuildId, prefix: String) {
+    async fn set_guild_prefix(
+        &self,
+        guild_id: GuildId,
+        prefix: String,
+    ) -> DbResult<()> {
         let result = sqlx::query!(
             r#"
             INSERT INTO configs (id, prefix)
@@ -62,9 +66,13 @@ impl PathogenDb for Postgres {
             prefix,
         )
         .execute(&self.pool)
-        .await
-        .unwrap();
+        .await?;
 
-        println!("{:#?}", result);
+        let redis_result =
+            self.redis.set_guild_prefix(&guild_id, &prefix).await;
+
+        println!("{:#?}\n{:#?}", result, redis_result);
+
+        Ok(())
     }
 }

@@ -14,8 +14,6 @@ use serenity::{
 };
 use tokio::time::Instant;
 
-use crate::db::PathogenDb;
-
 #[command("ping")]
 #[description = "Pong! See how long it takes the bot to respond"]
 pub async fn ping_cmd(ctx: &Context, msg: &Message) -> CommandResult {

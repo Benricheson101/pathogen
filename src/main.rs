@@ -25,9 +25,10 @@ use tracing_subscriber::EnvFilter;
 use_database!(Postgres);
 
 // -- COMMAND GROUPS --
-#[group]
-#[commands(ping_cmd, test_cmd)]
-struct Meta;
+#[group("Meta")]
+#[commands(ping_cmd)]
+#[description = "Meta commands. Nothing too special here c:"]
+struct MetaCmds;
 
 struct ShardManagerContainer;
 
@@ -98,7 +99,7 @@ async fn main() {
                 })
         })
         .help(&HELP_CMD)
-        .group(&META_GROUP);
+        .group(&METACMDS_GROUP);
 
     let mut client = Client::builder(&token)
         .framework(framework)
