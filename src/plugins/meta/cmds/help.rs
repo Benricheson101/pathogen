@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use serenity::{
     framework::standard::{
         help_commands,
-        macros::{command, help},
+        macros::help,
         Args,
         CommandGroup,
         CommandResult,
@@ -12,28 +12,12 @@ use serenity::{
     model::prelude::*,
     prelude::*,
 };
-use tokio::time::Instant;
-
-#[command("ping")]
-#[description = "Pong! See how long it takes the bot to respond"]
-pub async fn ping_cmd(ctx: &Context, msg: &Message) -> CommandResult {
-    let before = Instant::now();
-    let mut m = msg.channel_id.say(&ctx.http, ":ping_pong: Pong!").await?;
-    let elapsed = before.elapsed().as_millis();
-
-    m.edit(&ctx, |c| {
-        c.content(&format!(":ping_pong: Pong! Message sent in {}ms", elapsed))
-    })
-    .await?;
-
-    Ok(())
-}
 
 #[help]
 #[embed_success_colour = "#a97ccc"]
 #[individual_command_tip = "To learn more about a command, pass its name as an argument"]
 #[strikethrough_commands_tip_in_guild = ""]
-async fn help_cmd(
+pub async fn help_cmd(
     ctx: &Context,
     msg: &Message,
     args: Args,

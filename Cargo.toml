@@ -18,6 +18,8 @@ tracing = "0.1.25"
 dotenv = "0.15.0"
 mobc = "0.7.0"
 mobc-redis = "0.7.0"
+lazy_static = "1.4.0"
+regex = "1.4.3"
 
 [dependencies.serenity]
 version = "0.10.2"

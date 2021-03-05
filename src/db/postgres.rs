@@ -55,7 +55,7 @@ impl PathogenDb for Postgres {
         guild_id: GuildId,
         prefix: String,
     ) -> DbResult<()> {
-        let result = sqlx::query!(
+        sqlx::query!(
             r#"
             INSERT INTO configs (id, prefix)
             VALUES ($1, $2)
@@ -68,10 +68,7 @@ impl PathogenDb for Postgres {
         .execute(&self.pool)
         .await?;
 
-        let redis_result =
-            self.redis.set_guild_prefix(&guild_id, &prefix).await;
-
-        println!("{:#?}\n{:#?}", result, redis_result);
+        self.redis.set_guild_prefix(&guild_id, &prefix).await;
 
         Ok(())
     }

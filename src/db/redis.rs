@@ -33,7 +33,7 @@ impl Redis {
     pub async fn set_guild_prefix(
         &self,
         guild_id: &GuildId,
-        prefix: &String,
+        prefix: &str,
     ) -> bool {
         match self.pool.get().await {
             Ok(mut conn) => {

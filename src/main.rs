@@ -1,16 +1,16 @@
-mod cmds;
 mod db;
+mod plugins;
 mod util;
 
 use std::{collections::HashSet, env, sync::Arc};
 
-use cmds::meta::*;
 use db::{PathogenDb, Postgres};
 use dotenv::dotenv;
+use plugins::meta::cmds::*;
 use serenity::{
     async_trait,
     client::{bridge::gateway::ShardManager, Context, EventHandler},
-    framework::{standard::macros::group, StandardFramework},
+    framework::StandardFramework,
     http::Http,
     model::prelude::*,
     prelude::{Mutex, TypeMapKey},
@@ -23,12 +23,6 @@ use tracing_subscriber::EnvFilter;
 // If you choose to use your own DB implementation,
 // it must implement `crate::db::PathogenDb`
 use_database!(Postgres);
-
-// -- COMMAND GROUPS --
-#[group("Meta")]
-#[commands(ping_cmd)]
-#[description = "Meta commands. Nothing too special here c:"]
-struct MetaCmds;
 
 struct ShardManagerContainer;
 

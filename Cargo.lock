@@ -927,8 +927,10 @@ version = "0.1.0"
 dependencies = [
  "dotenv",
  "futures",
+ "lazy_static",
  "mobc",
  "mobc-redis",
+ "regex",
  "serde",
  "serde_json",
  "serenity",
