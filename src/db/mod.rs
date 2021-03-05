@@ -32,7 +32,8 @@ where
 #[derive(Debug)]
 pub enum PathogenDbError {
     DatabaseError(sqlx::Error),
-    RedisError(mobc::Error<mobc_redis::redis::RedisError>),
+    RedisError(mobc_redis::redis::RedisError),
+    RedisMobcError(mobc::Error<mobc_redis::redis::RedisError>),
 }
 
 impl error::Error for PathogenDbError {}
@@ -40,24 +41,33 @@ impl error::Error for PathogenDbError {}
 impl fmt::Display for PathogenDbError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            PathogenDbError::RedisError(err) => {
-                write!(f, "Redis Error: {:#?}", err)
-            },
             PathogenDbError::DatabaseError(err) => {
                 write!(f, "Database Error: {:#?}", err)
             },
+            PathogenDbError::RedisError(err) => {
+                write!(f, "Redis Error: {:#?}", err)
+            },
+            PathogenDbError::RedisMobcError(err) => {
+                write!(f, "Redis Mobc Error: {:#?}", err)
+            },
         }
-    }
-}
-
-impl From<mobc::Error<mobc_redis::redis::RedisError>> for PathogenDbError {
-    fn from(err: mobc::Error<mobc_redis::redis::RedisError>) -> Self {
-        Self::RedisError(err)
     }
 }
 
 impl From<sqlx::Error> for PathogenDbError {
     fn from(err: sqlx::Error) -> Self {
         Self::DatabaseError(err)
+    }
+}
+
+impl From<mobc_redis::redis::RedisError> for PathogenDbError {
+    fn from(err: mobc_redis::redis::RedisError) -> Self {
+        Self::RedisError(err)
+    }
+}
+
+impl From<mobc::Error<mobc_redis::redis::RedisError>> for PathogenDbError {
+    fn from(err: mobc::Error<mobc_redis::redis::RedisError>) -> Self {
+        Self::RedisMobcError(err)
     }
 }

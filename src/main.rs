@@ -6,10 +6,14 @@ use std::{collections::HashSet, env, sync::Arc};
 
 use db::{PathogenDb, Postgres};
 use dotenv::dotenv;
-use plugins::meta::cmds::*;
+use plugins::{meta::cmds::*, starboard};
 use serenity::{
     async_trait,
-    client::{bridge::gateway::ShardManager, Context, EventHandler},
+    client::{
+        bridge::gateway::{GatewayIntents, ShardManager},
+        Context,
+        EventHandler,
+    },
     framework::StandardFramework,
     http::Http,
     model::prelude::*,
@@ -36,6 +40,14 @@ struct Handler;
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, _data_about_bot: Ready) {
         println!("Ready on shard {}", ctx.shard_id);
+    }
+
+    async fn reaction_add(&self, ctx: Context, reaction: Reaction) {
+        starboard::handlers::on_reaction_add(&ctx, &reaction).await;
+    }
+
+    async fn reaction_remove(&self, ctx: Context, reaction: Reaction) {
+        starboard::handlers::on_reaction_remove(&ctx, &reaction).await;
     }
 }
 
@@ -98,6 +110,11 @@ async fn main() {
     let mut client = Client::builder(&token)
         .framework(framework)
         .event_handler(Handler)
+        .intents(
+            GatewayIntents::GUILDS
+                | GatewayIntents::GUILD_MESSAGES
+                | GatewayIntents::GUILD_MESSAGE_REACTIONS,
+        )
         .await
         .expect("Error creating client");
 

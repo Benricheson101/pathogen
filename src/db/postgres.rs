@@ -44,7 +44,8 @@ impl PathogenDb for Postgres {
 
             let prefix = query.ok()?.prefix?;
 
-            self.redis.set_guild_prefix(&guild_id, &prefix).await;
+            // its not the end of the world if this errors
+            self.redis.set_guild_prefix(&guild_id, &prefix).await.ok();
 
             Some(prefix)
         }
@@ -68,7 +69,7 @@ impl PathogenDb for Postgres {
         .execute(&self.pool)
         .await?;
 
-        self.redis.set_guild_prefix(&guild_id, &prefix).await;
+        self.redis.set_guild_prefix(&guild_id, &prefix).await?;
 
         Ok(())
     }

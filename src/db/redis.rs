@@ -2,10 +2,12 @@ use std::env;
 
 use mobc::Pool;
 use mobc_redis::{
-    redis::{self, AsyncCommands, RedisError},
+    redis::{self, AsyncCommands},
     RedisConnectionManager,
 };
 use serenity::model::id::GuildId;
+
+use super::DbResult;
 
 pub struct Redis {
     pool: Pool<RedisConnectionManager>,
@@ -34,14 +36,10 @@ impl Redis {
         &self,
         guild_id: &GuildId,
         prefix: &str,
-    ) -> bool {
-        match self.pool.get().await {
-            Ok(mut conn) => {
-                let res: Result<bool, RedisError> =
-                    conn.hset("prefix", guild_id.0.to_string(), prefix).await;
-                res.unwrap_or(false)
-            },
-            Err(_) => false,
-        }
+    ) -> DbResult<()> {
+        let mut conn = self.pool.get().await?;
+        let _: () = conn.hset("prefix", guild_id.0.to_string(), prefix).await?;
+
+        Ok(())
     }
 }
