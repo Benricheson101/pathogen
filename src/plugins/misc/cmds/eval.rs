@@ -81,11 +81,8 @@ pub async fn eval_cmd(
                 )
             }
 
-            // msg.channel_id.say(&ctx.http, out).await?;
         },
         Err(err) => {
-            // msg.channel_id.say(&ctx.http, format!("An error occurred :c
-            // ```rs\n{:#?}```", err)).await?;
             format!("An error occurred :c ```rs\n{:#?}```", err)
         },
     };
