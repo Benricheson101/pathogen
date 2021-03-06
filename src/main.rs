@@ -6,7 +6,7 @@ use std::{collections::HashSet, env, sync::Arc};
 
 use db::{PathogenDb, Postgres};
 use dotenv::dotenv;
-use plugins::{meta::cmds::*, starboard};
+use plugins::{meta::cmds::*, misc::cmds::*, starboard};
 use serenity::{
     async_trait,
     client::{
@@ -105,7 +105,8 @@ async fn main() {
                 })
         })
         .help(&HELP_CMD)
-        .group(&METACMDS_GROUP);
+        .group(&METACMDS_GROUP)
+        .group(&MISCCMDS_GROUP);
 
     let mut client = Client::builder(&token)
         .framework(framework)
