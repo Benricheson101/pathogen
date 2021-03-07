@@ -3,12 +3,41 @@ mod redis;
 
 use std::{error, fmt};
 
+use chrono::{DateTime, Utc};
 pub use postgres::Postgres;
 use serenity::{async_trait, model::id::GuildId, prelude::TypeMapKey};
 
-crate::impl_tmk![Postgres];
+// -- TABLE MODELS --
+#[derive(Debug)]
+pub struct GuildConfig {
+    pub id: i64,
+    pub prefix: Option<String>,
+}
 
-pub type DbResult<T> = Result<T, PathogenDbError>;
+#[derive(Debug)]
+pub struct Strike {
+    pub id: i32,
+    pub guild_id: i64,
+    pub target: i64,
+    pub moderator: i64,
+    pub kind: StrikeKind,
+    pub reason: Option<String>,
+    pub created_at: DateTime<Utc>,
+    pub edited_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, sqlx::Type)]
+#[non_exhaustive]
+#[sqlx(type_name = "strike_kind", rename_all = "lowercase")]
+pub enum StrikeKind {
+    Ban,
+    Kick,
+    Mute,
+    Warn,
+}
+
+// -- GENERAL DB STUFF --
+crate::impl_tmk![Postgres];
 
 #[async_trait]
 pub trait PathogenDb
@@ -28,6 +57,9 @@ where
         prefix: String,
     ) -> DbResult<()>;
 }
+
+// -- ERROR HANDLING STUFF --
+pub type DbResult<T> = Result<T, PathogenDbError>;
 
 #[derive(Debug)]
 pub enum PathogenDbError {

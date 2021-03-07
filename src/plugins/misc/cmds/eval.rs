@@ -80,7 +80,6 @@ pub async fn eval_cmd(
                         .to_string(),
                 )
             }
-
         },
         Err(err) => {
             format!("An error occurred :c ```rs\n{:#?}```", err)
