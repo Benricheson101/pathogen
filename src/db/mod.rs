@@ -1,39 +1,23 @@
 mod postgres;
 mod redis;
 
-use std::{error, fmt};
+use std::{error, fmt, option};
 
-use chrono::{DateTime, Utc};
+// use chrono::{DateTime, Utc};
 pub use postgres::Postgres;
-use serenity::{async_trait, model::id::GuildId, prelude::TypeMapKey};
+use serenity::{
+    async_trait,
+    model::id::{GuildId, UserId},
+    prelude::TypeMapKey,
+};
+
+use crate::plugins::moderation::Strike;
 
 // -- TABLE MODELS --
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct GuildConfig {
     pub id: i64,
     pub prefix: Option<String>,
-}
-
-#[derive(Debug)]
-pub struct Strike {
-    pub id: i32,
-    pub guild_id: i64,
-    pub target: i64,
-    pub moderator: i64,
-    pub kind: StrikeKind,
-    pub reason: Option<String>,
-    pub created_at: DateTime<Utc>,
-    pub edited_at: Option<DateTime<Utc>>,
-}
-
-#[derive(Debug, sqlx::Type)]
-#[non_exhaustive]
-#[sqlx(type_name = "strike_kind", rename_all = "lowercase")]
-pub enum StrikeKind {
-    Ban,
-    Kick,
-    Mute,
-    Warn,
 }
 
 // -- GENERAL DB STUFF --
@@ -49,13 +33,26 @@ where
     async fn get_guild_prefix(
         &self,
         guild_id: Option<GuildId>,
-    ) -> Option<String>;
+    ) -> DbResult<String>;
 
     async fn set_guild_prefix(
         &self,
         guild_id: GuildId,
         prefix: String,
     ) -> DbResult<()>;
+
+    async fn add_strike(&self, strike: &Strike) -> DbResult<()>;
+
+    async fn get_all_guild_strikes(
+        &self,
+        guild_id: &GuildId,
+    ) -> DbResult<Option<Vec<Strike>>>;
+
+    async fn get_all_user_strikes(
+        &self,
+        guild_id: &GuildId,
+        user: &UserId,
+    ) -> DbResult<Option<Vec<Strike>>>;
 }
 
 // -- ERROR HANDLING STUFF --
@@ -66,6 +63,8 @@ pub enum PathogenDbError {
     DatabaseError(sqlx::Error),
     RedisError(mobc_redis::redis::RedisError),
     RedisMobcError(mobc::Error<mobc_redis::redis::RedisError>),
+
+    NotFound(option::NoneError),
 }
 
 impl error::Error for PathogenDbError {}
@@ -81,6 +80,9 @@ impl fmt::Display for PathogenDbError {
             },
             PathogenDbError::RedisMobcError(err) => {
                 write!(f, "Redis Mobc Error: {:#?}", err)
+            },
+            PathogenDbError::NotFound(err) => {
+                write!(f, "Not Found: {:#?}", err)
             },
         }
     }
@@ -101,5 +103,11 @@ impl From<mobc_redis::redis::RedisError> for PathogenDbError {
 impl From<mobc::Error<mobc_redis::redis::RedisError>> for PathogenDbError {
     fn from(err: mobc::Error<mobc_redis::redis::RedisError>) -> Self {
         Self::RedisMobcError(err)
+    }
+}
+
+impl From<option::NoneError> for PathogenDbError {
+    fn from(none: option::NoneError) -> Self {
+        Self::NotFound(none)
     }
 }

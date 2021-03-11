@@ -1,3 +1,6 @@
+// Required for `std::option::NoneError`
+#![feature(try_trait)]
+
 mod db;
 mod plugins;
 mod util;
@@ -6,7 +9,7 @@ use std::{collections::HashSet, env, sync::Arc};
 
 use db::{PathogenDb, Postgres};
 use dotenv::dotenv;
-use plugins::{meta::cmds::*, misc::cmds::*, starboard};
+use plugins::{meta::cmds::*, misc::cmds::*, moderation::cmds::*, starboard};
 use serenity::{
     async_trait,
     client::{
@@ -21,6 +24,7 @@ use serenity::{
     Client,
 };
 use tracing_subscriber::EnvFilter;
+pub use util::regex;
 
 // Set the database to use here
 //
@@ -38,12 +42,16 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn ready(&self, ctx: Context, _data_about_bot: Ready) {
+    async fn ready(&self, ctx: Context, _ready: Ready) {
         println!("Ready on shard {}", ctx.shard_id);
     }
 
     async fn reaction_add(&self, ctx: Context, reaction: Reaction) {
         starboard::handlers::on_reaction_add(&ctx, &reaction).await;
+    }
+
+    async fn message(&self, _ctx: Context, _new_message: Message) {
+        println!("{}", _new_message.content);
     }
 
     async fn reaction_remove(&self, ctx: Context, reaction: Reaction) {
@@ -100,13 +108,14 @@ async fn main() {
                         let db =
                             data_read.get::<Database>().unwrap().lock().await;
 
-                        db.get_guild_prefix(msg.guild_id).await
+                        db.get_guild_prefix(msg.guild_id).await.ok()
                     })
                 })
         })
         .help(&HELP_CMD)
         .group(&METACMDS_GROUP)
-        .group(&MISCCMDS_GROUP);
+        .group(&MISCCMDS_GROUP)
+        .group(&MODERATIONCMDS_GROUP);
 
     let mut client = Client::builder(&token)
         .framework(framework)

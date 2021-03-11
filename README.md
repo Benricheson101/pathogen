@@ -16,7 +16,7 @@ just another general purpose discord bot
 
 ---
 ### TODO:
-[ ] Use redis for caching users
-[ ] Starboard plugin
-[ ] Moderation plugin (ban, kick, warn, strikes)
-[ ] Log plugin
+[] Use redis for caching users
+[] Starboard plugin
+[] Moderation plugin (ban, kick, warn, strikes)
+[] Log plugin

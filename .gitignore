@@ -2,3 +2,4 @@ target
 .env*
 !.env.example
 *.vim
+src/plugins/template

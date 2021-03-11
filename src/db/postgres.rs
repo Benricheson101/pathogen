@@ -3,7 +3,7 @@ use std::env;
 use serenity::{async_trait, model::prelude::*};
 use sqlx::{postgres::Postgres as SQLxPostgres, Pool};
 
-use super::{redis::Redis, DbResult, PathogenDb};
+use super::{redis::Redis, DbResult, PathogenDb, Strike};
 
 pub struct Postgres {
     pub pool: Pool<SQLxPostgres>,
@@ -27,13 +27,13 @@ impl PathogenDb for Postgres {
     async fn get_guild_prefix(
         &self,
         guild_id: Option<GuildId>,
-    ) -> Option<String> {
+    ) -> DbResult<String> {
         let guild_id = guild_id?;
 
         let from_redis = self.redis.get_guild_prefix(&guild_id).await;
 
         if from_redis.is_some() {
-            from_redis
+            Ok(from_redis?)
         } else {
             let query = sqlx::query!(
                 "SELECT prefix FROM configs WHERE id = $1",
@@ -47,7 +47,7 @@ impl PathogenDb for Postgres {
             // its not the end of the world if this errors
             self.redis.set_guild_prefix(&guild_id, &prefix).await.ok();
 
-            Some(prefix)
+            Ok(prefix)
         }
     }
 
@@ -72,5 +72,24 @@ impl PathogenDb for Postgres {
         self.redis.set_guild_prefix(&guild_id, &prefix).await?;
 
         Ok(())
+    }
+
+    async fn add_strike(&self, _strike: &Strike) -> DbResult<()> {
+        Ok(())
+    }
+
+    async fn get_all_guild_strikes(
+        &self,
+        _guild_id: &GuildId,
+    ) -> DbResult<Option<Vec<Strike>>> {
+        Ok(None)
+    }
+
+    async fn get_all_user_strikes(
+        &self,
+        _guild_id: &GuildId,
+        _user: &UserId,
+    ) -> DbResult<Option<Vec<Strike>>> {
+        Ok(None)
     }
 }
