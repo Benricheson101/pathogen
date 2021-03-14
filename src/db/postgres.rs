@@ -6,7 +6,7 @@ use sqlx::{postgres::Postgres as SQLxPostgres, Pool};
 use super::{redis::Redis, DbResult, PathogenDb, Strike};
 
 pub struct Postgres {
-    pub pool: Pool<SQLxPostgres>,
+    pool: Pool<SQLxPostgres>,
     redis: Redis,
 }
 

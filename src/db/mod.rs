@@ -53,6 +53,13 @@ where
         guild_id: &GuildId,
         user: &UserId,
     ) -> DbResult<Option<Vec<Strike>>>;
+
+    async fn get_guild_locale(
+        &self,
+        _guild_id: &Option<GuildId>,
+    ) -> Option<String> {
+        None
+    }
 }
 
 // -- ERROR HANDLING STUFF --
@@ -79,7 +86,7 @@ impl fmt::Display for PathogenDbError {
                 write!(f, "Redis Error: {:#?}", err)
             },
             PathogenDbError::RedisMobcError(err) => {
-                write!(f, "Redis Mobc Error: {:#?}", err)
+                write!(f, "Redis Connection Pool Error: {:#?}", err)
             },
             PathogenDbError::NotFound(err) => {
                 write!(f, "Not Found: {:#?}", err)

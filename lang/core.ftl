@@ -1,0 +1,2 @@
+-emojis-ping-pong = :ping_pong:
+-emojis-deny = :x:

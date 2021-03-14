@@ -1,5 +1,3 @@
-use fancy_regex::Regex;
-use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
@@ -7,12 +5,7 @@ use serenity::{
     prelude::*,
 };
 
-lazy_static! {
-    static ref CODEBLOCK_REGEX: Regex = Regex::new(
-        r"^(?P<block>```)([a-z]+)?(?P<code>(?:.|[\n])*)\n?(\k<block>)"
-    )
-    .expect("Unable to compile codeblock parse regex");
-}
+use crate::regex;
 
 #[derive(Serialize)]
 struct PlaygroundBody {
@@ -35,7 +28,7 @@ struct PlaygroundResponse {
 
 #[command("eval")]
 #[aliases("playground", "rust-playground")]
-#[min_args(2)]
+#[min_args(1)]
 #[description = "Execute Rust (nightly) code. Note: this code is NOT executed \
         in context, it is executed by the \
         [Rust Playground](https://play.rust-lang.org), thereby being available \
@@ -92,7 +85,7 @@ pub async fn eval_cmd(
 }
 
 fn parse_code(code: &str) -> String {
-    if let Ok(Some(caps)) = CODEBLOCK_REGEX.captures(&code) {
+    if let Ok(Some(caps)) = regex::CODE_BLOCK.captures(&code) {
         if let Some(c) = caps.name("code") {
             c.as_str().trim().to_string()
         } else {

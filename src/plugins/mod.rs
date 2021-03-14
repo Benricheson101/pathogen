@@ -1,6 +1,10 @@
+pub mod automod;
+pub mod config;
 pub mod leveling;
 pub mod logs;
 pub mod meta;
 pub mod misc;
 pub mod moderation;
 pub mod starboard;
+pub mod template;
+pub mod tickets;

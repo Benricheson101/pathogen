@@ -2,6 +2,7 @@
 #![feature(try_trait)]
 
 mod db;
+mod hooks;
 mod plugins;
 mod util;
 
@@ -9,7 +10,13 @@ use std::{collections::HashSet, env, sync::Arc};
 
 use db::{PathogenDb, Postgres};
 use dotenv::dotenv;
-use plugins::{meta::cmds::*, misc::cmds::*, moderation::cmds::*, starboard};
+use plugins::{
+    config::cmds::*,
+    meta::cmds::*,
+    misc::cmds::*,
+    moderation::cmds::*,
+    starboard,
+};
 use serenity::{
     async_trait,
     client::{
@@ -24,7 +31,7 @@ use serenity::{
     Client,
 };
 use tracing_subscriber::EnvFilter;
-pub use util::regex;
+pub use util::{i18n::*, regex};
 
 // Set the database to use here
 //
@@ -48,10 +55,6 @@ impl EventHandler for Handler {
 
     async fn reaction_add(&self, ctx: Context, reaction: Reaction) {
         starboard::handlers::on_reaction_add(&ctx, &reaction).await;
-    }
-
-    async fn message(&self, _ctx: Context, _new_message: Message) {
-        println!("{}", _new_message.content);
     }
 
     async fn reaction_remove(&self, ctx: Context, reaction: Reaction) {
@@ -113,6 +116,8 @@ async fn main() {
                 })
         })
         .help(&HELP_CMD)
+        .on_dispatch_error(hooks::dispatch_error)
+        .group(&CONFIGCMDS_GROUP)
         .group(&METACMDS_GROUP)
         .group(&MISCCMDS_GROUP)
         .group(&MODERATIONCMDS_GROUP);
@@ -128,10 +133,13 @@ async fn main() {
         .await
         .expect("Error creating client");
 
+    let i18n = Arc::new(I18n::new(db.clone()));
+
     {
         let mut data = client.data.write().await;
         data.insert::<Database>(db.clone());
         data.insert::<ShardManagerContainer>(client.shard_manager.clone());
+        data.insert::<I18n>(i18n.clone());
     }
 
     let shard_manager = client.shard_manager.clone();

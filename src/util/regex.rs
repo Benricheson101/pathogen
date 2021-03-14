@@ -1,3 +1,4 @@
+use fancy_regex::Regex as FancyRegex;
 use lazy_static::lazy_static;
 use regex::Regex;
 
@@ -61,4 +62,15 @@ lazy_static! {
             max_cmd_len = MAX_COMMAND_LEN,
     ))
         .expect("Failed to compile `SLASH_COMMAND` regex");
+
+    /// Matches a code block
+    ///
+    /// # Capture Groups:
+    /// - `block` - The three backticks that create the code block (used internally)
+    /// - `lang` - The language of the code block
+    /// - `code` - The code inside the code block
+    pub static ref CODE_BLOCK: FancyRegex = FancyRegex::new(
+        r"^(?P<block>```)(?P<lang>[a-z]+)?(?P<code>(?:.|[\n])*)\n?(\k<block>)"
+    )
+        .expect("Failed to compile `CODE_BLOCK` regex");
 }

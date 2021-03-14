@@ -1,3 +1,5 @@
+alias b := build
+
 build mode='':
 	{{ if mode == "release" { "cargo build --release" } else { "cargo build" } }}
 
