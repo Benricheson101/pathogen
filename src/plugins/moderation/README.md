@@ -9,12 +9,12 @@ Every moderation action you perform on a user will give them a preset number of 
 ## Commands
 
 ## TODO:
-[] ban
-[] tempban
-[] multiban
-[] kick
-[] multikick
-[] warn
-[] multiwarn
-[] mute
-[] multimute
+- [ ] ban
+- [ ] tempban
+- [ ] multiban
+- [ ] kick
+- [ ] multikick
+- [ ] warn
+- [ ] multiwarn
+- [ ] mute
+- [ ] multimute

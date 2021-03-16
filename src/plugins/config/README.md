@@ -7,8 +7,8 @@ This plugin is for managing guild configs.
 {commands}
 
 ## TODO:
-- [] Create
-- [] Read
-- [] Update
-- [] Delete 
-- [] Revert
+- [ ] Create
+- [ ] Read
+- [ ] Update
+- [ ] Delete 
+- [ ] Revert

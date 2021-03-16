@@ -7,8 +7,8 @@ The ticket plugin is a complete ticket system, providing an easy way for server 
 {commands}
 
 ## TODO:
-- [] New
-- [] Close
-- [] Save and serve transcript
-- [] Add member
-- [] Remove member
+- [ ] New
+- [ ] Close
+- [ ] Save and serve transcript
+- [ ] Add member
+- [ ] Remove member
