@@ -1,7 +1,9 @@
 pub mod cmds;
+mod db;
 
 use std::{convert::TryFrom, fmt};
 
+pub use db::*;
 use serde::{Deserialize, Serialize};
 
 pub trait ConfigSection<'a>
@@ -13,12 +15,12 @@ where
 /// A model representing a guild's configuration.
 ///
 /// NOTE: all fields should be `Option<T>` so they are nullable
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct GuildConfig {
     /// The prefix the bot responds to
-    prefix: Option<String>,
+    pub prefix: Option<String>,
     /// The language identifier
-    lang: Option<String>,
+    pub lang: Option<String>,
 }
 
 impl TryFrom<&String> for GuildConfig {

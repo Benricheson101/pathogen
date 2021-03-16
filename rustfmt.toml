@@ -51,10 +51,10 @@ newline_style = "Unix"
 group_imports = "StdExternalCrate"
 
 # show warning about FIXME comments
-report_fixme = "Always"
+# report_fixme = "Always"
 
 # show warning about TODO comments
-report_todo = "Always"
+report_todo = "Never"
 
 # struct Foo {
 #     x: u32,

@@ -3,64 +3,13 @@ mod redis;
 
 use std::{error, fmt, option};
 
-// use chrono::{DateTime, Utc};
 pub use postgres::Postgres;
-use serenity::{
-    async_trait,
-    model::id::{GuildId, UserId},
-    prelude::TypeMapKey,
-};
 
 use crate::plugins::moderation::Strike;
-
-// -- TABLE MODELS --
-#[derive(Debug, PartialEq)]
-pub struct GuildConfig {
-    pub id: i64,
-    pub prefix: Option<String>,
-}
+// use crate::plugins::config::GuildConfig;
 
 // -- GENERAL DB STUFF --
 crate::impl_tmk![Postgres];
-
-#[async_trait]
-pub trait PathogenDb
-where
-    Self: Send + Sync + TypeMapKey,
-{
-    async fn new() -> Self;
-
-    async fn get_guild_prefix(
-        &self,
-        guild_id: Option<GuildId>,
-    ) -> DbResult<String>;
-
-    async fn set_guild_prefix(
-        &self,
-        guild_id: GuildId,
-        prefix: String,
-    ) -> DbResult<()>;
-
-    async fn add_strike(&self, strike: &Strike) -> DbResult<()>;
-
-    async fn get_all_guild_strikes(
-        &self,
-        guild_id: &GuildId,
-    ) -> DbResult<Option<Vec<Strike>>>;
-
-    async fn get_all_user_strikes(
-        &self,
-        guild_id: &GuildId,
-        user: &UserId,
-    ) -> DbResult<Option<Vec<Strike>>>;
-
-    async fn get_guild_locale(
-        &self,
-        _guild_id: &Option<GuildId>,
-    ) -> Option<String> {
-        None
-    }
-}
 
 // -- ERROR HANDLING STUFF --
 pub type DbResult<T> = Result<T, PathogenDbError>;

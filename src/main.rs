@@ -1,5 +1,5 @@
-// Required for `std::option::NoneError`
 #![feature(try_trait)]
+// Required for `std::option::NoneError`
 
 mod db;
 mod hooks;
@@ -8,7 +8,7 @@ mod util;
 
 use std::{collections::HashSet, env, sync::Arc};
 
-use db::{PathogenDb, Postgres};
+use db::Postgres;
 use dotenv::dotenv;
 use plugins::{
     config::cmds::*,
@@ -32,12 +32,7 @@ use serenity::{
 };
 use tracing_subscriber::EnvFilter;
 pub use util::{i18n::*, regex};
-
-// Set the database to use here
-//
-// If you choose to use your own DB implementation,
-// it must implement `crate::db::PathogenDb`
-use_database!(Postgres);
+use Postgres as Database;
 
 struct ShardManagerContainer;
 
@@ -104,14 +99,14 @@ async fn main() {
                 .on_mention(Some(bot_id))
                 .ignore_bots(true)
                 .with_whitespace(true)
-                .prefix("")
+                .prefix("~")
                 .dynamic_prefix(|ctx, msg| {
                     Box::pin(async move {
                         let data_read = ctx.data.read().await;
                         let db =
                             data_read.get::<Database>().unwrap().lock().await;
 
-                        db.get_guild_prefix(msg.guild_id).await.ok()
+                        db.get_guild_prefix(&msg.guild_id).await.ok()
                     })
                 })
         })

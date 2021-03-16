@@ -70,7 +70,21 @@ lazy_static! {
     /// - `lang` - The language of the code block
     /// - `code` - The code inside the code block
     pub static ref CODE_BLOCK: FancyRegex = FancyRegex::new(
-        r"^(?P<block>```)(?P<lang>[a-z]+)?(?P<code>(?:.|[\n])*)\n?(\k<block>)"
+        r"^(?P<block>```)(?P<lang>[a-z]+\n)?(?P<code>(?:.|[\n])*)\n?(\k<block>)"
     )
         .expect("Failed to compile `CODE_BLOCK` regex");
+}
+
+/// Parses a code block and returns a string containing the code in the code
+/// block
+pub fn parse_code_block(code: String) -> String {
+    if let Ok(Some(caps)) = CODE_BLOCK.captures(&code) {
+        if let Some(code) = caps.name("code") {
+            code.as_str().to_string()
+        } else {
+            code
+        }
+    } else {
+        code
+    }
 }

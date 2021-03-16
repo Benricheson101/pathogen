@@ -8,7 +8,7 @@ use serenity::{
 };
 use unic_langid::{langid, LanguageIdentifier};
 
-use crate::{db::PathogenDb, Database};
+use crate::Database;
 
 const ENGLISH: LanguageIdentifier = langid!("en");
 
